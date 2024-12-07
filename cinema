@@ -1,0 +1,112 @@
+import csv
+
+class Film:
+    def __init__(self, title, country, year, length):
+        self.title = title
+        self.country = country
+        self.year = year
+        self.length = length
+
+    def __str__(self):
+        return f"{self.title} ({self.country}), {self.year} year, {self.length} m"
+
+    def length_in_hours(self):
+        hours = self.length // 60
+        minutes = self.length % 60
+        return f"{hours}h {minutes}m"
+
+    def __sub__(self, minutes):
+        if minutes < 0:
+            raise ValueError("Minutes to subtract must be non-negative.")
+        self.length = max(0, self.length - minutes)
+        return self
+
+class Session(Film):
+    DAYS_OF_WEEK = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+
+    def __init__(self, title, country, year, length, day, start_time):
+        super().__init__(title, country, year, length)
+        self.day = day
+        self.start_time = start_time
+
+    def __str__(self):
+        return (f"{super().__str__()} on {self.day} at {self.start_time}")
+
+    def move_to_next_day(self):
+        current_index = self.DAYS_OF_WEEK.index(self.day)
+        self.day = self.DAYS_OF_WEEK[(current_index + 1) % 7]
+
+    def end_time(self):
+        start_hours, start_minutes = map(int, self.start_time.split(":"))
+        end_minutes = start_minutes + self.length
+        end_hours = start_hours + end_minutes // 60
+        end_minutes = end_minutes % 60
+        return f"{end_hours}:{end_minutes}"
+
+    def __lt__(self, other):
+        if not isinstance(other, Session):
+            return NotImplemented
+        return self.end_time() < other.end_time()
+
+class Cinema:
+    def __init__(self):
+        self.schedule = []
+
+    def __str__(self):
+        return "\n".join(str(session) for session in self.schedule)
+
+    def add_session(self, session):
+        self.schedule.append(session)
+        self.schedule.sort(key=lambda s: (Session.DAYS_OF_WEEK.index(s.day), s.start_time))
+
+    def latest_session_per_day(self):
+        latest_sessions = {}
+        for session in self.schedule:
+            day = session.day
+            if day not in latest_sessions or latest_sessions[day].end_time() < session.end_time():
+                latest_sessions[day] = session
+        return latest_sessions
+
+    @staticmethod
+    def load_from_csv():
+        cinema = Cinema()
+        with open("cinema_data.csv", 'r') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                session = Session(
+                    title=row['title'],
+                    country=row['country'],
+                    year=int(row['year']),
+                    length=int(row['length']),
+                    day=row['day'],
+                    start_time=row['start_time']
+                )
+                cinema.add_session(session)
+        return cinema
+
+# Demonstration program
+if __name__ == "__main__":
+
+    cinema = Cinema.load_from_csv()
+
+    print("Cinema schedule:")
+    print(cinema)
+    print()
+
+
+    print("Details of all sessions:")
+    for session in cinema.schedule:
+        print(f"Session: {session}")
+        print(f"End time: {session.end_time()}")
+        session.move_to_next_day()
+        print(f"Moved to next day: {session}")
+        print()
+
+
+    print("Latest session per day:")
+    latest_sessions = cinema.latest_session_per_day()
+    for day, session in latest_sessions.items():
+        print(f"{day}: {session}")
+
+
+
