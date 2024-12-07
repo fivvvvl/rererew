@@ -1,0 +1,66 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Завантаження даних з файлу (припустимо, файл називається 'austin_airport.csv')
+data = pd.read_csv('austin_airport.csv')
+
+# Перевірка структури даних
+print(data.head())
+
+# а) Скільки рейсів до кожного місця призначення було здійснено за день та за місяць
+# Додамо стовпці з датою і місяцем
+data['Date'] = pd.to_datetime(data['FlightDate'])
+data['Month'] = data['Date'].dt.month
+data['Day'] = data['Date'].dt.day
+
+# Рейси за день
+flights_per_day = data.groupby(['Destination', 'Date']).size()
+print("Рейси за день:")
+print(flights_per_day)
+
+# Рейси за місяць
+flights_per_month = data.groupby(['Destination', 'Month']).size()
+print("Рейси за місяць:")
+print(flights_per_month)
+
+# b) Скільки разів літав кожен літак
+flights_per_aircraft = data['AircraftID'].value_counts()
+print("Кількість рейсів кожного літака:")
+print(flights_per_aircraft)
+
+# с) Яка середня затримка рейсу за місяць, у певне місце призначення та по днях
+# Затримки за місяць
+avg_delay_per_month = data.groupby('Month')['DepartureDelay'].mean()
+print("Середня затримка за місяць:")
+print(avg_delay_per_month)
+
+# Затримки за місцем призначення
+avg_delay_per_destination = data.groupby('Destination')['DepartureDelay'].mean()
+print("Середня затримка за місцем призначення:")
+print(avg_delay_per_destination)
+
+# Затримки за днями
+avg_delay_per_day = data.groupby('Date')['DepartureDelay'].mean()
+print("Середня затримка за днями:")
+print(avg_delay_per_day)
+
+# d) Макс та мін тривалість польоту
+max_flight_duration = data['FlightDuration'].max()
+min_flight_duration = data['FlightDuration'].min()
+print(f"Максимальна тривалість польоту: {max_flight_duration}")
+print(f"Мінімальна тривалість польоту: {min_flight_duration}")
+
+# е) Макс та мін відхилення запланованого часу польоту від фактичного
+data['TimeDeviation'] = data['ActualDuration'] - data['ScheduledDuration']
+max_deviation = data['TimeDeviation'].max()
+min_deviation = data['TimeDeviation'].min()
+print(f"Максимальне відхилення часу польоту: {max_deviation}")
+print(f"Мінімальне відхилення часу польоту: {min_deviation}")
+
+# f) Чи існує залежність між часом затримки вильоту та тривалістю польоту
+plt.scatter(data['DepartureDelay'], data['FlightDuration'], alpha=0.6, color='blue')
+plt.title('Залежність між затримкою вильоту та тривалістю польоту')
+plt.xlabel('Затримка вильоту (хвилини)')
+plt.ylabel('Тривалість польоту (хвилини)')
+plt.show()
