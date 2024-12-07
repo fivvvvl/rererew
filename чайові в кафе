@@ -1,0 +1,63 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Завантаження даних з файлу (припустимо, файл називається 'tips.csv')
+data = pd.read_csv('tips.csv')
+
+# Перевірка структури даних
+print(data.head())
+
+# а) Хто дає більші чайові: курці чи ні?
+smoker_tips = data.groupby('smoker')['tip'].mean()
+print("Середні чайові курців і некурців:")
+print(smoker_tips)
+
+# Графік для порівняння
+smoker_tips.plot(kind='bar', color=['skyblue', 'orange'], title='Чайові: курці проти некурців')
+plt.ylabel('Середні чайові')
+plt.show()
+
+# б) Чайові по днях тижня
+day_tips = data.groupby('day')['tip'].mean()
+print("Середні чайові по днях тижня:")
+print(day_tips)
+
+# Графік
+day_tips.plot(kind='bar', color='green', title='Чайові по днях тижня')
+plt.ylabel('Середні чайові')
+plt.show()
+
+# с) Чайові в залежності від часу (обід, вечеря)
+time_tips = data.groupby('time')['tip'].mean()
+print("Середні чайові за часом прийому їжі:")
+print(time_tips)
+
+# Графік
+time_tips.plot(kind='bar', color=['purple', 'red'], title='Чайові за часом прийому їжі')
+plt.ylabel('Середні чайові')
+plt.show()
+
+# d) Гістограма рахунків
+plt.hist(data['total_bill'], bins=8, color='blue', edgecolor='black')
+plt.title('Гістограма рахунків')
+plt.xlabel('Рахунок')
+plt.ylabel('Частота')
+plt.show()
+
+# e) Скаттер (рахунок - чайові)
+plt.scatter(data['total_bill'], data['tip'], alpha=0.6, color='magenta')
+plt.title('Залежність чайових від рахунку')
+plt.xlabel('Рахунок')
+plt.ylabel('Чайові')
+plt.show()
+
+# 1) Залежність чайових від статі клієнта
+gender_tips = data.groupby('sex')['tip'].mean()
+print("Середні чайові за статтю клієнта:")
+print(gender_tips)
+
+# Графік
+gender_tips.plot(kind='bar', color=['cyan', 'pink'], title='Чайові за статтю клієнта')
+plt.ylabel('Середні чайові')
+plt.show()
