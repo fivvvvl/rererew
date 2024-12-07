@@ -1,0 +1,70 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Завантаження даних з файлу (припустимо, файл називається 'titanic.csv')
+data = pd.read_csv('titanic.csv')
+
+# Перевірка структури даних
+print(data.head())
+
+# а) Вижив (Survived) - скільки осіб вижило, а скільки загинуло
+survival_counts = data['Survived'].value_counts()
+print("Кількість виживших і загиблих:")
+print(survival_counts)
+
+# Графік для виживання
+survival_counts.plot(kind='bar', color=['red', 'green'], title='Виживання пасажирів')
+plt.xticks(ticks=[0, 1], labels=['Не вижив', 'Вижив'], rotation=0)
+plt.ylabel('Кількість пасажирів')
+plt.show()
+
+# b) Вижив по класах, в абсолютних та відносних величинах
+class_survival = data.groupby('Pclass')['Survived'].agg(['sum', 'count'])
+class_survival['Relative'] = class_survival['sum'] / class_survival['count']
+print("Виживання по класах:")
+print(class_survival)
+
+# Графік
+class_survival['Relative'].plot(kind='bar', color='blue', title='Виживання по класах (відносно)')
+plt.ylabel('Частка виживших')
+plt.show()
+
+# с) Вижив за віком (Age)
+def age_category(age):
+    if age < 30:
+        return 'Молоді (<30)'
+    elif age <= 60:
+        return 'Середні (30-60)'
+    else:
+        return 'Старші (>60)'
+
+# Додамо категорію віку до даних
+data['AgeCategory'] = data['Age'].apply(age_category)
+age_survival = data.groupby('AgeCategory')['Survived'].mean()
+print("Виживання за віковими категоріями:")
+print(age_survival)
+
+# Графік
+age_survival.plot(kind='bar', color='orange', title='Виживання за віковими категоріями')
+plt.ylabel('Частка виживших')
+plt.show()
+
+# d) Походження пасажирів (Embarked)
+embarked_counts = data['Embarked'].value_counts()
+print("Кількість пасажирів за портом відправлення:")
+print(embarked_counts)
+
+# Графік
+embarked_counts.plot(kind='bar', color='purple', title='Кількість пасажирів за портом відправлення')
+plt.ylabel('Кількість пасажирів')
+plt.show()
+
+# е) Як плата за квиток (Fare) залежить від класу каюти (Pclass)
+plt.figure(figsize=(8, 6))
+plt.boxplot([data[data['Pclass'] == i]['Fare'].dropna() for i in sorted(data['Pclass'].unique())],
+            labels=sorted(data['Pclass'].unique()), patch_artist=True, boxprops=dict(facecolor='lightblue'))
+plt.title('Розподіл плати за квиток залежно від класу каюти')
+plt.xlabel('Клас каюти')
+plt.ylabel('Плата за квиток')
+plt.show()
