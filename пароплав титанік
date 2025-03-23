@@ -2,13 +2,12 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Завантаження даних з файлу (припустимо, файл називається 'titanic.csv')
 data = pd.read_csv('titanic.csv')
 
 # Перевірка структури даних
 print(data.head())
 
-# а) Вижив (Survived) - скільки осіб вижило, а скільки загинуло
+#  Вижив (Survived) - скільки осіб вижило, а скільки загинуло
 survival_counts = data['Survived'].value_counts()
 print("Кількість виживших і загиблих:")
 print(survival_counts)
@@ -19,7 +18,7 @@ plt.xticks(ticks=[0, 1], labels=['Не вижив', 'Вижив'], rotation=0)
 plt.ylabel('Кількість пасажирів')
 plt.show()
 
-# b) Вижив по класах, в абсолютних та відносних величинах
+# Вижив по класах, в абсолютних та відносних величинах
 class_survival = data.groupby('Pclass')['Survived'].agg(['sum', 'count'])
 class_survival['Relative'] = class_survival['sum'] / class_survival['count']
 print("Виживання по класах:")
@@ -30,7 +29,7 @@ class_survival['Relative'].plot(kind='bar', color='blue', title='Виживан�
 plt.ylabel('Частка виживших')
 plt.show()
 
-# с) Вижив за віком (Age)
+# Вижив за віком (Age)
 def age_category(age):
     if age < 30:
         return 'Молоді (<30)'
@@ -50,7 +49,7 @@ age_survival.plot(kind='bar', color='orange', title='Виживання за в�
 plt.ylabel('Частка виживших')
 plt.show()
 
-# d) Походження пасажирів (Embarked)
+# Походження пасажирів (Embarked)
 embarked_counts = data['Embarked'].value_counts()
 print("Кількість пасажирів за портом відправлення:")
 print(embarked_counts)
@@ -60,7 +59,7 @@ embarked_counts.plot(kind='bar', color='purple', title='Кількість па�
 plt.ylabel('Кількість пасажирів')
 plt.show()
 
-# е) Як плата за квиток (Fare) залежить від класу каюти (Pclass)
+# Як плата за квиток (Fare) залежить від класу каюти (Pclass)
 plt.figure(figsize=(8, 6))
 plt.boxplot([data[data['Pclass'] == i]['Fare'].dropna() for i in sorted(data['Pclass'].unique())],
             labels=sorted(data['Pclass'].unique()), patch_artist=True, boxprops=dict(facecolor='lightblue'))
